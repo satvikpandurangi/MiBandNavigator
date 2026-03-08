@@ -18,8 +18,6 @@ class NavigationService : NotificationListenerService() {
     private lateinit var notifier: NotificationHelper
 
     private var lastDirection: NavDirection = NavDirection.UNKNOWN
-    private var lastDistance: String = ""
-    private var lastUpdateTime: Long = 0
 
     private val uiReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -28,10 +26,8 @@ class NavigationService : NotificationListenerService() {
                 val testDirection = NavDirection.valueOf(dirName)
                 val testData = NavData("150 m", "Test Road", testDirection, "10 min", "4.5 km")
 
+                // Reset state to force the test notification through
                 lastDirection = NavDirection.UNKNOWN
-                lastDistance = ""
-                lastUpdateTime = 0
-
                 notifier.sendToBand(testData)
             } catch (e: Exception) {
                 Log.e(TAG, "Error parsing test direction", e)
@@ -56,19 +52,8 @@ class NavigationService : NotificationListenerService() {
         if (sbn?.packageName != GOOGLE_MAPS_PACKAGE) return
 
         val extras = sbn.notification.extras
-
-        // --- SETTINGS INTEGRATION ---
         val sharedPrefs = getSharedPreferences("NavSettings", Context.MODE_PRIVATE)
-        val isDebugEnabled = sharedPrefs.getBoolean("debug_mode", false)
         val isVibrationEnabled = sharedPrefs.getBoolean("vibrate_turn", true)
-
-        // Only dump logs if Developer Debug Mode is ON
-        if (isDebugEnabled) {
-            Log.w(TAG, "🐛 DEBUG MODE ON: Dumping Extras")
-            for (key in extras.keySet()) {
-                Log.w(TAG, "🐛 KEY: '$key' | VALUE: '${extras.get(key)}'")
-            }
-        }
 
         val title = extras.getCharSequence("android.title")?.toString() ?: ""
         val text = extras.getCharSequence("android.text")?.toString() ?: ""
@@ -77,26 +62,28 @@ class NavigationService : NotificationListenerService() {
 
         val cleanData = parser.parseMapsData(title, text, subText, textLines)
 
-        if (cleanData.direction == lastDirection && cleanData.distance == lastDistance) return
-
-        val currentTime = System.currentTimeMillis()
+        // ==========================================
+        // VIBRATION FIX: THE "THROTTLE"
+        // ==========================================
+        // If the direction is exactly the same as the last one we sent, DO NOTHING.
+        // This stops Google Maps from buzzing your wrist every time the distance drops.
         if (cleanData.direction == lastDirection) {
-            if (currentTime - lastUpdateTime < 10000) return
+            return
         }
 
-        // Only force heavy vibration if the user wants it!
-        if (cleanData.direction != lastDirection && cleanData.direction != NavDirection.UNKNOWN) {
+        // We have a NEW direction!
+        if (cleanData.direction != NavDirection.UNKNOWN) {
             if (isVibrationEnabled) {
                 Log.d(TAG, "📳 TURN CHANGED! Forcing new alert.")
-                notifier.clear()
+                notifier.clear() // Clear the old notification so Zepp recognizes this as a fresh, buzz-worthy alert
             }
+
+            // Send the update to the band
+            notifier.sendToBand(cleanData)
+
+            // Save this direction so we don't buzz again until the next turn
+            lastDirection = cleanData.direction
         }
-
-        lastDirection = cleanData.direction
-        lastDistance = cleanData.distance
-        lastUpdateTime = currentTime
-
-        notifier.sendToBand(cleanData)
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
@@ -104,8 +91,6 @@ class NavigationService : NotificationListenerService() {
         if (sbn?.packageName == GOOGLE_MAPS_PACKAGE) {
             notifier.clear()
             lastDirection = NavDirection.UNKNOWN
-            lastDistance = ""
-            lastUpdateTime = 0
         }
     }
 }

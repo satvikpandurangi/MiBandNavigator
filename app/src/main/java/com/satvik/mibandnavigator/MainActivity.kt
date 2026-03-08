@@ -444,17 +444,31 @@ fun WatchDisplaySimulator(compactMode: Boolean) {
             }
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("150 m", color = Color.White, fontSize = 16.sp)
+                // Combined Top Text
+                Text("150 m  •  10 min", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("    •    \n   •••   \n    •    \n    •    ", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, lineHeight = 22.sp, textAlign = TextAlign.Center)
+
+                // Full 5-line arrow with tail
+                Text(
+                    "    •    \n" +
+                            "   • •   \n" +
+                            "  •   •  \n" +
+                            "    •    \n" +
+                            "    •    ",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 22.sp,
+                    textAlign = TextAlign.Center
+                )
+
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("Test Road", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("10 min • 4.5 km", color = TextGray, fontSize = 12.sp)
+                // Combined Bottom Text
+                Text("Test Road  •  4.5 km", color = TextGray, fontSize = 14.sp)
             }
         }
     }
 }
-
 @Composable
 fun AboutNavigatorSection() {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -471,6 +485,10 @@ fun AboutNavigatorSection() {
 
         Spacer(modifier = Modifier.height(24.dp))
         Text("A systems-integration project built to bridge Google Maps navigation directly to legacy Xiaomi and Amazfit hardware through standard notification protocols.", textAlign = TextAlign.Center, fontSize = 12.sp, color = TextGray, lineHeight = 18.sp)
+
+        // --- YOUR DEVELOPER SIGNATURE ---
+        Spacer(modifier = Modifier.height(32.dp))
+        Text("Developed by 7week", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = CyanAccent.copy(alpha = 0.7f), letterSpacing = 1.sp)
     }
 }
 

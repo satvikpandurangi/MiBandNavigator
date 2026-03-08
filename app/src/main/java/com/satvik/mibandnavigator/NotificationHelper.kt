@@ -11,7 +11,6 @@ class NotificationHelper(private val context: Context) {
     private val CHANNEL_ID = "nav_channel"
     private val NOTIFICATION_ID = 1001
 
-    // Access our saved settings!
     private val sharedPrefs = context.getSharedPreferences("NavSettings", Context.MODE_PRIVATE)
 
     init {
@@ -30,15 +29,7 @@ class NotificationHelper(private val context: Context) {
     fun sendToBand(navData: NavData) {
         val isCompact = sharedPrefs.getBoolean("compact_mode", false)
 
-        val bottomLine = if (navData.eta.isNotEmpty() && navData.totalDistance.isNotEmpty()) {
-            "${navData.eta} • ${navData.totalDistance}"
-        } else {
-            navData.eta + navData.totalDistance
-        }
-
         val text = if (isCompact) {
-            // --- COMPACT MODE ---
-            // Uses standard emojis to save vertical screen space
             val smallArrow = when (navData.direction) {
                 NavDirection.LEFT -> "⬅️"
                 NavDirection.RIGHT -> "➡️"
@@ -49,20 +40,70 @@ class NotificationHelper(private val context: Context) {
                 NavDirection.ROUNDABOUT -> "🔄"
                 else -> "⏺"
             }
+            // Compact mode text
+            val bottomLine = if (navData.eta.isNotEmpty()) "${navData.eta} • ${navData.totalDistance}" else navData.totalDistance
             "$smallArrow ${navData.distance}\n${navData.roadName}\n$bottomLine"
         } else {
-            // --- DOT MATRIX MODE (Default) ---
+            // --- THE FULL 5-LINE GRID WITH TAILS ---
             val arrowArt = when (navData.direction) {
-                NavDirection.STRAIGHT -> "    •    \n   •••   \n    •    \n    •    "
-                NavDirection.LEFT -> "      •  \n     •   \n   ••••  \n     •   \n      •  "
-                NavDirection.RIGHT -> "  •      \n   •     \n  ••••   \n   •     \n  •      "
-                NavDirection.UTURN -> "   •••   \n  •   •  \n  •   •  \n  •      \n  •      "
-                NavDirection.SLIGHT_LEFT -> "   ••••  \n   ••    \n   • •   \n     •   "
-                NavDirection.SLIGHT_RIGHT -> "  ••••   \n    ••   \n   • •   \n   •     "
-                NavDirection.ROUNDABOUT -> "    ••   \n  •    • \n  •    • \n    ••   "
-                else -> "   •••   \n   •••   \n   •••   "
+                NavDirection.STRAIGHT ->
+                    "    •    \n" +
+                            "   • •   \n" +
+                            "  •   •  \n" +
+                            "    •    \n" +
+                            "    •    "
+                NavDirection.LEFT ->
+                    "      •  \n" +
+                            "    •    \n" +
+                            "  • • • •\n" +
+                            "    •    \n" +
+                            "      •  "
+                NavDirection.RIGHT ->
+                    "  •      \n" +
+                            "    •    \n" +
+                            "• • • •  \n" +
+                            "    •    \n" +
+                            "  •      "
+                NavDirection.UTURN ->
+                    "   •••   \n" +
+                            "  •   •  \n" +
+                            "  •  ••  \n" +
+                            "  • •    \n" +
+                            "  •      "
+                NavDirection.SLIGHT_LEFT ->
+                    "   ••    \n" +
+                            "  •  •   \n" +
+                            "      •  \n" +
+                            "      •  \n" +
+                            "         "
+                NavDirection.SLIGHT_RIGHT ->
+                    "    ••   \n" +
+                            "   •  •  \n" +
+                            "  •      \n" +
+                            "  •      \n" +
+                            "         "
+                NavDirection.ROUNDABOUT ->
+                    "   •••   \n" +
+                            "  •   •  \n" +
+                            "    ••   \n" +
+                            "  ••     \n" +
+                            " •       "
+                else ->
+                    "    •    \n" +
+                            "   • •   \n" +
+                            "  •   •  \n" +
+                            "    •    \n" +
+                            "    •    "
             }
-            "${navData.distance}\n$arrowArt\n${navData.roadName}\n$bottomLine"
+
+            // --- THE TEXT COMPRESSION FIX ---
+            // We combine the ETA with the distance at the top (e.g., "150 m • 10 min")
+            // We combine the Total Distance with the road name at the bottom (e.g., "Test Road • 4.5 km")
+            // This saves a full line of vertical space, allowing the tail to stay!
+            val topText = if (navData.eta.isNotEmpty()) "${navData.distance}  •  ${navData.eta}" else navData.distance
+            val bottomText = if (navData.totalDistance.isNotEmpty()) "${navData.roadName}    ${navData.totalDistance}" else navData.roadName
+
+            "$topText\n$arrowArt\n$bottomText"
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
