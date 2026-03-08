@@ -53,8 +53,15 @@ UI Framework: Jetpack Compose (Material Design 3)
 Graphics: Native Compose Canvas API for custom scalable vector drawing.
 
 Architecture: Event-driven background processing with real-time UI state observation.
+## 🤝 Contributing & Forking
+This project is 100% open-source. I built this to solve a personal hardware limitation, but there is always room for optimization! 
 
-🤝 Contributing
-This is an open-source systems integration project. Feel free to fork the repository, submit pull requests, or open issues if you find ways to optimize the parsing logic, improve battery efficiency, or expand device compatibility!
+Whether you want to use this code as a base for your own wearable projects, or you want to help make MiBand Navigator better, you are highly encouraged to fork this repository. 
 
+**Areas where I'd love some help:**
+* **Battery Optimization:** Ideas to make the `NotificationListenerService` even more lightweight.
+* **Device Support:** Expanding the custom ASCII parsers for different screen sizes (like the newer Mi Band 8/9 standard).
+* **Code Review:** If you are an experienced Android dev and see a way to make the Compose UI or Canvas math cleaner, open a Pull Request!
+
+Feel free to open an Issue, submit a Pull Request, or just fork the repo to experiment.
 Engineered by Satvik — Built for the Xiaomi wearable ecosystem.
