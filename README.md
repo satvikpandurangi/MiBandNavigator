@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="logo.png" width="150" alt="MiBand-Navigator-Logo.png">
+</p>
 MiBand Navigator 🧭
 Seamless Google Maps Turn-by-Turn Navigation for Xiaomi & Amazfit Smart Bands.
 
