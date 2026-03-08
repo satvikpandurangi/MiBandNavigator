@@ -3,13 +3,15 @@
 </p>
  <h1 align="center">🧭 MiBand Navigator</h1>
 
-<p align="center">
+<p align="left">
   <strong>Seamless Google Maps Turn-by-Turn Navigation for Xiaomi & Amazfit Smart Bands.</strong>
 </p>
 
 <p align="left">
   MiBand Navigator is a lightweight, background-driven Android application designed to bridge the gap between Google Maps and legacy fitness trackers. By leveraging Android's notification listener service, this app intercepts live navigation data, parses it, and formats it into optimized visual alerts forwarded directly to your wrist via the Zepp ecosystem.
 </p>
+
+
 
 
 ## 🚀 The Problem & The Solution
