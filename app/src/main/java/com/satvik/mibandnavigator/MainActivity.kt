@@ -1,11 +1,15 @@
 package com.satvik.mibandnavigator
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -34,6 +38,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.core.content.ContextCompat
 
 // Core color theme
 val SlateBackground = Color(0xFF0F172A)
@@ -44,8 +49,13 @@ val TextGray = Color(0xFF94A3B8)
 val SuccessGreen = Color(0xFF10B981)
 
 class MainActivity : ComponentActivity() {
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestRuntimePermissions()
         setContent {
             val colorScheme = darkColorScheme(
                 background = SlateBackground,
@@ -60,6 +70,23 @@ class MainActivity : ComponentActivity() {
                     MainAppController()
                 }
             }
+        }
+    }
+
+    private fun requestRuntimePermissions() {
+        val permissions = buildList {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (permissions.isNotEmpty()) {
+            permissionLauncher.launch(permissions.toTypedArray())
         }
     }
 }
@@ -481,7 +508,7 @@ fun AboutNavigatorSection() {
 
         Spacer(modifier = Modifier.height(16.dp))
         Text("MiBand Navigator", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = TextActive)
-        Text("Version 1.0.0", fontSize = 12.sp, color = TextGray, modifier = Modifier.padding(top = 2.dp))
+        Text("Version 1.1.0", fontSize = 12.sp, color = TextGray, modifier = Modifier.padding(top = 2.dp))
 
         Spacer(modifier = Modifier.height(24.dp))
         Text("A systems-integration project built to bridge Google Maps navigation directly to legacy Xiaomi and Amazfit hardware through standard notification protocols.", textAlign = TextAlign.Center, fontSize = 12.sp, color = TextGray, lineHeight = 18.sp)
@@ -553,6 +580,7 @@ fun RowScope.TestNavItem(title: String, icon: ImageVector, direction: NavDirecti
         modifier = Modifier.weight(weight).aspectRatio(1.2f).clickable {
             val intent = Intent("TRIGGER_TEST_NAV")
             intent.putExtra("test_dir", direction.name)
+            intent.setPackage(context.packageName)
             context.sendBroadcast(intent)
         },
         color = SlateCard, shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, Color.White.copy(alpha = 0.03f))

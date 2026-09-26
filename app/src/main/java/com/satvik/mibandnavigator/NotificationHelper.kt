@@ -8,8 +8,8 @@ import androidx.core.app.NotificationCompat
 class NotificationHelper(private val context: Context) {
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    private val CHANNEL_ID = "nav_channel"
-    private val NOTIFICATION_ID = 1001
+    private val channelId = "nav_channel"
+    private val notificationId = 1001
 
     private val sharedPrefs = context.getSharedPreferences("NavSettings", Context.MODE_PRIVATE)
 
@@ -19,14 +19,14 @@ class NotificationHelper(private val context: Context) {
 
     private fun createChannel() {
         val channel = NotificationChannel(
-            CHANNEL_ID,
+            channelId,
             "Mi Band Alerts",
             NotificationManager.IMPORTANCE_HIGH
         ).apply { description = "Sends turn-by-turn alerts to Zepp" }
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun sendToBand(navData: NavData) {
+    fun sendToBand(navData: NavData, alert: Boolean = true) {
         val isCompact = sharedPrefs.getBoolean("compact_mode", false)
 
         val text = if (isCompact) {
@@ -106,19 +106,20 @@ class NotificationHelper(private val context: Context) {
             "$topText\n$arrowArt\n$bottomText"
         }
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_map)
             .setContentTitle(" ")
             .setContentText(text)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_NAVIGATION)
             .setOnlyAlertOnce(true)
+            .setSilent(!alert)
             .build()
 
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(notificationId, notification)
     }
 
     fun clear() {
-        notificationManager.cancel(NOTIFICATION_ID)
+        notificationManager.cancel(notificationId)
     }
 }

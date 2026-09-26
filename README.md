@@ -7,7 +7,7 @@
 ### Seamless Google Maps turn-by-turn navigation for Xiaomi & Amazfit smart bands
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/satvikpandurangi/MiBandNavigator)
-[![Release](https://img.shields.io/badge/Release-v1.0.0-success?style=flat)](https://github.com/satvikpandurangi/MiBandNavigator/releases/tag/v1.0.0)
+[![Release](https://img.shields.io/badge/Release-v1.1.0-success?style=flat)](https://github.com/satvikpandurangi/MiBandNavigator/releases/tag/v1.1.0)
 [![Kotlin](https://img.shields.io/badge/Kotlin-100%25-7F52FF?style=flat&logo=kotlin&logoColor=white)](https://github.com/satvikpandurangi/MiBandNavigator)
 [![Stars](https://img.shields.io/github/stars/satvikpandurangi/MiBandNavigator?style=flat)](https://github.com/satvikpandurangi/MiBandNavigator/stargazers)
 [![Open Source](https://img.shields.io/badge/Open%20Source-100%25-blue?style=flat)](https://github.com/satvikpandurangi/MiBandNavigator)
@@ -18,7 +18,7 @@
 
 ## 📖 Overview
 
-**MiBand Navigator** is a lightweight, background-driven Android application that bridges Google Maps and legacy fitness trackers. Using Android's notification listener service, it intercepts live navigation data from Google Maps, parses it, and reformats it into optimized visual alerts forwarded directly to a Xiaomi Mi Band or Amazfit band through the Zepp ecosystem.
+**MiBand Navigator** is a lightweight, background-driven Android application that bridges Google Maps and legacy fitness trackers. Using Android's notification listener service, it intercepts live navigation data from Google Maps, parses it, and reformats it into optimized visual alerts forwarded directly to a Xiaomi Mi Band or Amazfit band through Zepp Life or Zepp.
 
 ## ❓ Problem Statement
 
@@ -32,6 +32,8 @@ Most legacy smart bands lack native map integration or turn-by-turn navigation s
   - Compact Notifications — shorter text formats for small band screens
   - Visual Progress Bars — real-time distance tracking visualizer
 - **UX Throttling** — smart vibration controls to avoid excessive buzzing during rapid map updates
+- **Connection-Aware Delivery** — navigation alerts are emitted only while a supported Mi Band or Amazfit Band is actively connected over Bluetooth LE
+- **Real-Time Navigation Sync** — every changed Maps payload is forwarded immediately, while distance and ETA refreshes stay silent and only new maneuvers vibrate
 - **Modern Android UI** — Jetpack Compose interface with custom Canvas-drawn icons, live notification previews, and a built-in setup guide
 
 ## ⚙️ System Architecture / Workflow
@@ -49,13 +51,13 @@ Parser (extracts distance & direction data)
 Formatter (ASCII arrows / compact text / progress bar)
         │
         ▼
-Zepp App (forwards alert via BLE)
+Zepp Life / Zepp (forwards alert via BLE)
         │
         ▼
 Mi Band / Amazfit Display
 ```
 
-**Compatible Devices:** Mi Band 4, 5, 6, 7, 8; future Mi Bands; Amazfit Band Series — all bridged through the Zepp / Zepp Life app.
+**Compatible Devices:** Mi Band 4, 5, 6, 7, 8; future Mi Bands; Amazfit Band Series — all bridged through the Zepp Life / Zepp app.
 
 ## 🛠️ Tech Stack
 
@@ -90,11 +92,19 @@ MiBandNavigator/
 
 ## 📱 Usage
 
-1. **Install & open Zepp** — ensure it's connected to your band and running in the background.
-2. **Enable Notification Access** — go to Settings → Notifications → MiBand Navigator, and allow all notifications.
-3. **Configure Zepp Forwarding** — in Zepp → Notification → App Alerts, enable "MiBand Navigator."
-4. **Disable Battery Optimization** — for both this app and Zepp, to keep them alive in the background.
-5. **Start Navigation** — open Google Maps and begin a route; your band will display turn-by-turn alerts with vibration cues.
+1. **Install & open Zepp Life or Zepp** — ensure it's connected to your band and running in the background.
+2. **Allow Nearby Devices and Notifications** — accept the Android permission prompts when the app first opens.
+3. **Enable Notification Access** — tap **Grant Notification Access** in MiBand Navigator and enable the service.
+4. **Configure notification forwarding** — in Zepp Life / Zepp → Notification → App Alerts, enable "MiBand Navigator."
+5. **Disable Battery Optimization** — for both this app and Zepp Life / Zepp, to keep them alive in the background.
+6. **Connect your band and start navigation** — alerts are sent only while a supported band is connected and Google Maps has an active route. Distance and ETA updates refresh silently; a new maneuver triggers vibration.
+
+## 🔐 Permissions & Privacy
+
+- **Notification access** is used only to read active Google Maps navigation notifications.
+- **Nearby devices** is used only to verify that a supported band is currently connected over Bluetooth LE.
+- **Post notifications** is used to provide the formatted navigation alert that Zepp forwards to the band.
+- Navigation data stays on the phone; the app has no internet permission and does not upload route information.
 
 ## 📸 Screenshots
 

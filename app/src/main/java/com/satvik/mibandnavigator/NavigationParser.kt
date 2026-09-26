@@ -19,18 +19,15 @@ class NavigationParser {
     // Updated to accept subText and textLines from the notification
     fun parseMapsData(title: String, text: String, subText: String, textLines: Array<String>?): NavData {
         // Combine both strings and make them lowercase to make searching easier
-        val combinedText = "$title $text".lowercase()
+        val primaryText = "$title $text".lowercase()
+        val supplementalText = textLines.orEmpty().joinToString(" ").lowercase()
 
         // Scan for keywords to determine the arrow direction
-        val dir = when {
-            combinedText.contains("roundabout") -> NavDirection.ROUNDABOUT
-            combinedText.contains("u-turn") || combinedText.contains("u turn") -> NavDirection.UTURN
-            combinedText.contains("slight left") -> NavDirection.SLIGHT_LEFT
-            combinedText.contains("slight right") -> NavDirection.SLIGHT_RIGHT
-            combinedText.contains("left") -> NavDirection.LEFT
-            combinedText.contains("right") -> NavDirection.RIGHT
-            combinedText.contains("straight") || combinedText.contains("towards") -> NavDirection.STRAIGHT
-            else -> NavDirection.UNKNOWN
+        val primaryDirection = detectDirection(primaryText)
+        val dir = if (primaryDirection != NavDirection.UNKNOWN) {
+            primaryDirection
+        } else {
+            detectDirection(supplementalText)
         }
 
         // Clean up the road name to save screen space on the Mi Band
@@ -62,4 +59,17 @@ class NavigationParser {
             totalDistance = parsedTotalDist
         )
     }
+
+    private fun detectDirection(value: String): NavDirection = when {
+        value.contains("roundabout") -> NavDirection.ROUNDABOUT
+        value.contains("u-turn") || value.contains("u turn") -> NavDirection.UTURN
+        value.contains("slight left") || value.contains("keep left") || value.contains("bear left") -> NavDirection.SLIGHT_LEFT
+        value.contains("slight right") || value.contains("keep right") || value.contains("bear right") -> NavDirection.SLIGHT_RIGHT
+        value.contains("left") -> NavDirection.LEFT
+        value.contains("right") -> NavDirection.RIGHT
+        value.contains("straight") || value.contains("toward") || value.contains("continue") ||
+            value.contains("head ") || value.contains("merge") -> NavDirection.STRAIGHT
+        else -> NavDirection.UNKNOWN
+    }
+
 }
