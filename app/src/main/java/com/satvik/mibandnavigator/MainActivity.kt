@@ -365,7 +365,7 @@ fun SetupScreen() {
 
 @Composable
 fun CompatibleDevicesSection() {
-    val bands = listOf("Mi Band 4", "Mi Band 5", "Mi Band 6", "Mi Band 7", "Amazfit Band")
+    val bands = BandConnectionMonitor.supportedDeviceDisplayNames
 
     LazyRow(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         items(bands.size) { index ->

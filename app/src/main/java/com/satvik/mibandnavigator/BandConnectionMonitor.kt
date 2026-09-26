@@ -41,6 +41,15 @@ class BandConnectionMonitor(context: Context) {
     }
 
     companion object {
+        internal val supportedDeviceDisplayNames = listOf(
+            "Mi Band 4",
+            "Mi Band 5",
+            "Mi Band 6",
+            "Mi Band 7",
+            "Mi Band 8",
+            "Amazfit Band Series"
+        )
+
         internal fun isSupportedBandName(name: String): Boolean {
             val normalized = name.lowercase().replace(Regex("[^a-z0-9]+"), " ").trim()
             return normalized.contains("mi band") ||

@@ -1,10 +1,29 @@
 package com.satvik.mibandnavigator
 
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BandConnectionMonitorTest {
+    @Test
+    fun uiListsEveryDeclaredSupportedDeviceFamily() {
+        assertEquals(
+            listOf(
+                "Mi Band 4",
+                "Mi Band 5",
+                "Mi Band 6",
+                "Mi Band 7",
+                "Mi Band 8",
+                "Amazfit Band Series"
+            ),
+            BandConnectionMonitor.supportedDeviceDisplayNames
+        )
+        BandConnectionMonitor.supportedDeviceDisplayNames.forEach { name ->
+            assertTrue("Expected UI device $name to be accepted", BandConnectionMonitor.isSupportedBandName(name))
+        }
+    }
+
     @Test
     fun recognizesSupportedBandFamilies() {
         listOf(
@@ -22,7 +41,7 @@ class BandConnectionMonitorTest {
 
     @Test
     fun rejectsUnrelatedBluetoothDevices() {
-        listOf("Car Audio", "Wireless Earbuds", "Pixel Watch", "Unknown").forEach { name ->
+        listOf("Car Audio", "Wireless Earbuds", "Pixel Watch", "Mi Watch", "Amazfit GTR", "Unknown").forEach { name ->
             assertFalse("Expected $name to be rejected", BandConnectionMonitor.isSupportedBandName(name))
         }
     }
